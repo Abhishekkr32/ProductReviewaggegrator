@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReviewAI - Smart Product Review Aggregator</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --text: #2b2d42;
+            --text-light: #8d99ae;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f1f3f5;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav ul li a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-bar button {
+            padding: 0 2rem;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-bar button:hover {
+            background-color: var(--secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.25rem;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Review Cards */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .review-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .review-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .review-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .review-card:hover .review-image img {
+            transform: scale(1.05);
+        }
+
+        .review-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .review-content {
+            padding: 1.5rem;
+        }
+
+        .review-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .review-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .review-rating {
+            color: var(--warning);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .review-excerpt {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+
+        .review-source {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-source img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* API Section */
+        .api-section {
+            background-color: white;
+            padding: 4rem 0;
+            margin: 4rem 0;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .api-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .api-content h2 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .api-content p {
+            margin-bottom: 2.5rem;
+            color: var(--text-light);
+        }
+
+        .api-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .api-feature {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .api-feature h4 {
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-feature p {
+            margin-bottom: 0;
+            font-size: 0.875rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .api-response {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            display: none;
+        }
+
+        .api-response pre {
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 380px;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .chatbot-container.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .chatbot-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chatbot-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .chatbot-body {
+            background-color: white;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: var(--primary);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            background-color: #f1f5f9;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px 0 0 8px;
+            outline: none;
+            font-size: 0.875rem;
+        }
+
+        .chat-input button {
+            padding: 0 1.25rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .chatbot-toggle:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 4rem 0 2rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-column ul li a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column ul li a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #495057;
+            color: #adb5bd;
+            font-size: 0.875rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            color: white;
+            background-color: #495057;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+            
+            .chatbot-container {
+                width: calc(100% - 2rem);
+                right: 1rem;
+                bottom: 1rem;
+            }
+            
+            .chatbot-toggle {
+                right: 1rem;
+                bottom: 1rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">
+                <i class="fas fa-robot"></i>
+                ReviewAI
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Products</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <div class="hero-content">
+            <h1>AI-Powered Product Review Aggregation</h1>
+            <p>Get comprehensive, unbiased product reviews aggregated from multiple sources and analyzed by advanced AI to help you make the best purchasing decisions.</p>
+            <div class="search-bar">
+                <input type="text" placeholder="Search for products, brands, or categories...">
+                <button>
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <section class="main-content">
+        <div class="container">
+            <div class="section-title">
+                <h2>Top Rated Products</h2>
+                <p>Discover the best products based on aggregated reviews from trusted sources and our AI analysis.</p>
+            </div>
+            
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-image">
+                        <img src="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Sony WH-1000XM5">
+                        <span class="review-badge">Editors' Choice</span>
+                    </div>
+                    <div class="review-content">
+                        <h3 class="review-title">Sony WH-1000XM5 Wireless Headphones</h3>
+                        <div class="review-meta">
+                            <span>Headphones</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                4.8
+                            </span>
+                        </div>
+                        <p class="review-excerpt">Our AI analyzed 1,243 reviews and found these to be the best noise-canceling headphones with exceptional sound quality and comfort for long listening sessions.</p>
+                        <div class="review-source">
+                            <img src="https://logo.clearbit.com/cnet.com" alt="CNET">
+                            <span>Aggregated from 12 sources</span>
+                        </div>
+                        <a href="#" class="btn">
+                            View Analysis
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-image">
+                        <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="MacBook Pro">
+                        <span class="review-badge">Top Pick</span>
+                    </div>
+                    <div class="review-content">
+                        <h3 class="review-title">Apple MacBook Pro 14" M2 Pro</h3>
+                        <div class="review-meta">
+                            <span>Laptops</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                4.9
+                            </span>
+                        </div>
+                        <p class="review-excerpt">Based on 2,187 reviews, this laptop excels in performance, battery life, and display quality, making it the top choice for professionals and creatives.</p>
+                        <div class="review-source">
+                            <img src="https://logo.clearbit.com/techradar.com" alt="TechRadar">
+                            <span>Aggregated from 15 sources</span>
+                        </div>
+                        <a href="#" class="btn">
+                            View Analysis
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="review-card">
+                    <div class="review-image">
+                        <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Apple Watch">
+                        <span class="review-badge">Best Value</span>
+                    </div>
+                    <div class="review-content">
+                        <h3 class="review-title">Apple Watch Series 8</h3>
+                        <div class="review-meta">
+                            <span>Smartwatches</span>
+                            <span class="review-rating">
+                                <i class="fas fa-star"></i>
+                                4.6
+                            </span>
+                        </div>
+                        <p class="review-excerpt">Our analysis of 1,756 reviews shows this smartwatch offers the best combination of health features, performance, and ecosystem integration.</p>
+                        <div class="review-source">
+                            <img src="https://logo.clearbit.com/theverge.com" alt="The Verge">
+                            <span>Aggregated from 9 sources</span>
+                        </div>
+                        <a href="#" class="btn">
+                            View Analysis
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title" style="margin-top: 4rem;">
+                <h2>How Our AI Works</h2>
+                <p>We use advanced machine learning to analyze thousands of reviews and provide you with the most accurate insights.</p>
+            </div>
+            
+            <div class="api-section">
+                <div class="api-content">
+                    <h2>OpenAI API Integration</h2>
+                    <p>Our platform leverages OpenAI's powerful APIs to analyze and aggregate product reviews with advanced AI capabilities.</p>
+                    
+                    <div class="api-features">
+                        <div class="api-feature">
+                            <h4><i class="fas fa-project-diagram"></i> Projects Management</h4>
+                            <p>Manage and organize your review analysis projects with our integrated OpenAI Projects API.</p>
+                        </div>
+                        <div class="api-feature">
+                            <h4><i class="fas fa-users"></i> User Collaboration</h4>
+                            <p>Collaborate with team members using the Projects Users API for shared review analysis.</p>
+                        </div>
+                        <div class="api-feature">
+                            <h4><i class="fas fa-brain"></i> AI Analysis</h4>
+                            <p>Advanced natural language processing to extract insights from thousands of reviews.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="fetchProjects" class="btn">
+                            <i class="fas fa-cloud-download-alt"></i>
+                            Fetch Projects
+                        </button>
+                        <button id="fetchProjectDetails" class="btn btn-outline">
+                            <i class="fas fa-info-circle"></i>
+                            Get Project Details
+                        </button>
+                    </div>
+                    
+                    <div id="apiResponse" class="api-response">
+                        <h4>API Response</h4>
+                        <pre id="responseData">API response will appear here...</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header" id="chatbotHeader">
+            <div class="chatbot-title">
+                <i class="fas fa-robot"></i>
+                <span>ReviewAI Assistant</span>
+            </div>
+            <button class="chatbot-close" id="chatbotClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chatbot-body">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    Hello! I'm your ReviewAI assistant. I can help you find the best products based on aggregated reviews and AI analysis. What are you looking for today?
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Type your question...">
+                <button id="sendMessage">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="chatbot-toggle" id="chatbotToggle">
+        <i class="fas fa-comments"></i>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>ReviewAI</h3>
+                    <p>The most advanced AI-powered product review aggregator, helping you make better purchasing decisions.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul>
+                        <li><a href="#">Top Rated</a></li>
+                        <li><a href="#">New Releases</a></li>
+                        <li><a href="#">Best Value</a></li>
+                        <li><a href="#">Editors' Choice</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="#">Electronics</a></li>
+                        <li><a href="#">Home & Kitchen</a></li>
+                        <li><a href="#">Fashion</a></li>
+                        <li><a href="#">Health & Beauty</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 ReviewAI. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Chatbot functionality
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbot = document.getElementById('chatbot');
+        const chatbotClose = document.getElementById('chatbotClose');
+        const userInput = document.getElementById('userInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        chatbotToggle.addEventListener('click', () => {
+            chatbot.classList.add('active');
+        });
+        
+        chatbotClose.addEventListener('click', () => {
+            chatbot.classList.remove('active');
+        });
+        
+        sendMessage.addEventListener('click', sendChatMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        function sendChatMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage(message, 'user');
+                userInput.value = '';
+                
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message bot-message';
+                typingIndicator.id = 'typingIndicator';
+                typingIndicator.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typingIndicator');
+                    if (indicator) indicator.remove();
+                    
+                    // Generate response (in a real app, this would call your backend API)
+                    const responses = [
+                        "Based on aggregated reviews, the Sony WH-1000XM5 headphones have a 92% satisfaction rate for noise cancellation.",
+                        "Our AI analysis of 1,500 reviews shows the MacBook Pro M2 has an average rating of 4.8/5 for performance.",
+                        "Looking at recent reviews across 12 sources, the iPhone 14 Pro is praised for its camera but criticized for its high price.",
+                        "Would you like me to compare specific products for you?",
+                        "I can provide detailed analysis on any product category. What are you interested in?"
+                    ];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    addMessage(randomResponse, 'bot');
+                }, 1500);
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = message ${sender}-message;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // API Integration
+        const fetchProjectsBtn = document.getElementById('fetchProjects');
+        const fetchProjectDetailsBtn = document.getElementById('fetchProjectDetails');
+        const apiResponse = document.getElementById('apiResponse');
+        const responseData = document.getElementById('responseData');
+        
+        // Mock API responses (in a real app, you would call your backend which calls OpenAI API)
+        const mockProjectsResponse = {
+            "data": [
+                {
+                    "id": "proj_abc123",
+                    "name": "Electronics Review Analysis",
+                    "created_at": "2023-05-15T10:30:00Z",
+                    "updated_at": "2023-06-20T14:45:00Z"
+                },
+                {
+                    "id": "proj_def456",
+                    "name": "Home Appliances Sentiment",
+                    "created_at": "2023-04-10T09:15:00Z",
+                    "updated_at": "2023-06-18T11:20:00Z"
+                },
+                {
+                    "id": "proj_ghi789",
+                    "name": "Fashion Products Comparison",
+                    "created_at": "2023-03-05T13:20:00Z",
+                    "updated_at": "2023-06-15T16:30:00Z"
+                }
+            ]
+        };
+        
+        const mockProjectDetailsResponse = {
+            "id": "proj_abc123",
+            "name": "Electronics Review Analysis",
+            "description": "Project analyzing consumer electronics reviews across multiple platforms",
+            "created_at": "2023-05-15T10:30:00Z",
+            "updated_at": "2023-06-20T14:45:00Z",
+            "stats": {
+                "total_reviews_analyzed": 12453,
+                "average_rating": 4.2,
+                "products_covered": 287,
+                "sources": 15
+            }
+        };
+        
+        const mockProjectUsersResponse = {
+            "data": [
+                {
+                    "id": "user_123",
+                    "name": "John Doe",
+                    "email": "john@example.com",
+                    "role": "admin",
+                    "joined_at": "2023-05-16T08:20:00Z"
+                },
+                {
+                    "id": "user_456",
+                    "name": "Jane Smith",
+                    "email": "jane@example.com",
+                    "role": "analyst",
+                    "joined_at": "2023-05-18T11:15:00Z"
+                }
+            ]
+        };
+        
+        fetchProjectsBtn.addEventListener('click', () => {
+            apiResponse.style.display = 'block';
+            responseData.textContent = JSON.stringify(mockProjectsResponse, null, 2);
+            
+            // In a real implementation:
+            // fetch('/api/projects')
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         responseData.textContent = JSON.stringify(data, null, 2);
+            //     })
+            //     .catch(error => {
+            //         responseData.textContent = 'Error: ' + error.message;
+            //     });
+        });
+        
+        fetchProjectDetailsBtn.addEventListener('click', () => {
+            apiResponse.style.display = 'block';
+            responseData.textContent = JSON.stringify(mockProjectDetailsResponse, null, 2);
+            
+            // In a real implementation:
+            // fetch('/api/projects/abc123')
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         responseData.textContent = JSON.stringify(data, null, 2);
+            //     })
+            //     .catch(error => {
+            //         responseData.textContent = 'Error: ' + error.message;
+            //     });
+        });
+    </script>
+</body>
+</html>
